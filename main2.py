@@ -6,6 +6,7 @@ from PyQt4.QtCore import QDate
 
 from contacts_widget import ContactsWidget
 from database import PhonebookDatabase
+from alphabet_widget import AlphabetWidget
 
 
 class Phonebook(QMainWindow):
@@ -179,16 +180,32 @@ class MainWindow(QMainWindow):
     def initUI(self):
         self.setGeometry(300, 300, 700, 400)
         self.setWindowTitle(u'Phonebook')
-
+        self.show_birthdays_notification()
+    
         # создаем виджет с таблицей контактов
         contacts_widget = ContactsWidget(self)
-
+    
         # добавляем виджет с таблицей контактов в layout главного окна
         layout = QVBoxLayout()
+        alphabet_widget = AlphabetWidget(self)
+        layout.addWidget(alphabet_widget)
         layout.addWidget(contacts_widget)
         widget = QWidget()
         widget.setLayout(layout)
         self.setCentralWidget(widget)
+    
+        # Растягиваем contacts_widget на всю доступную область главного окна
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+
+    def show_birthdays_notification(self):
+        db = PhonebookDatabase()
+        birthdays = db.get_birthdays()
+        if birthdays:
+            msg = u"Ближайшие дни рождения:\n"
+            for bday in birthdays:
+                msg += u"{} {} ({})\n".format(bday[1], bday[2], bday[4])
+            QMessageBox.information(self, u'Дни рождения', msg, QMessageBox.Ok)
 
     def closeEvent(self, event):
         self.login_window.close()  # Close the LoginWindow instance when MainWindow is closed

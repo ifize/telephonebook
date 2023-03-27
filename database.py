@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import mysql.connector
 
 from utils import encode_utf8
@@ -37,8 +38,8 @@ class PhonebookDatabase:
         return contacts
 
     def get_birthdays(self):
-        query = ("SELECT * FROM contacts WHERE MONTH(birthday) = MONTH(NOW()) "
-                 "AND DAY(birthday) BETWEEN DAY(NOW()) AND DAY(NOW()+7) ORDER BY DAY(birthday)")
+        query = ("SELECT * FROM contacts WHERE MONTH(birth_date) = MONTH(NOW()) "
+                 "AND DAY(birth_date) BETWEEN DAY(NOW()) AND DAY(NOW()+7) ORDER BY DAY(birth_date)")
         return self.execute_query(query)
 
     def get_contact(self, id):
@@ -96,3 +97,15 @@ class PhonebookDatabase:
         self.cursor.execute(query, encoded_values)
         count = self.cursor.fetchone()[0]
         return count > 0
+    
+    def get_contacts_by_alphabet(self, letter_range):
+        letter_start, letter_end = letter_range.split('-')
+
+        query = ("SELECT * FROM contacts WHERE last_name >= %s AND last_name <= %s ORDER BY last_name")
+        values = (letter_start, letter_end)
+
+        self.cursor.execute(query, values)
+        columns = [col[0] for col in self.cursor.description]
+        contacts = [dict(zip(columns, row)) for row in self.cursor.fetchall()]
+        return contacts
+
