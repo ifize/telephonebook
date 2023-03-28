@@ -42,10 +42,11 @@ class PhonebookDatabase:
                  "AND DAY(birth_date) BETWEEN DAY(NOW()) AND DAY(NOW()+7) ORDER BY DAY(birth_date)")
         return self.execute_query(query)
 
-    def get_contact(self, id):
-        query = ("SELECT * FROM contacts WHERE id = %s")
-        values = (id,)
-        return self.execute_query(query, values)
+    def get_contact(self, contact_id):
+        query = "SELECT * FROM contacts WHERE id = %s"
+        result = self.execute_query(query, (contact_id,))
+        print("Contact query result:", result)  # добавьте эту строку для вывода результатов запроса
+        return result
 
     def add_contact(self, first_name, last_name, phone_number, birth_date):
         try:
@@ -60,8 +61,7 @@ class PhonebookDatabase:
             return False
 
     def update_contact(self, id, name, phone, email, birthday):
-        query = ("UPDATE contacts SET name=%s, phone=%s, email=%s, birthday=%s "
-                 "WHERE id=%s")
+        query = "UPDATE contacts SET first_name=%s, last_name=%s, phone_number=%s, birth_date=%s WHERE id=%s"
         values = (name, phone, email, birthday, id)
         self.execute_update_query(query, values)
 
