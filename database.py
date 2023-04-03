@@ -70,6 +70,25 @@ class PhonebookDatabase:
         values = (id,)
         self.execute_delete_query(query, values)
 
+    def get_contacts_by_alphabet(self, first_letter, last_letter):
+        query = (
+            u"SELECT id, last_name, first_name, phone_number, birth_date "
+            u"FROM contacts "
+            u"WHERE last_name >= %s AND last_name <= %s "
+            u"ORDER BY last_name"
+        )
+        self.cursor.execute(query, (first_letter, last_letter))
+        return [
+            {
+                'id': row[0],
+                'last_name': row[1],
+                'first_name': row[2],
+                'phone_number': row[3],
+                'birth_date': row[4]
+            }
+            for row in self.cursor.fetchall()
+        ]
+
     def check_duplicate(self, login):
         query = ("SELECT COUNT(*) FROM users WHERE login = %s")
         values = (login,)
@@ -98,14 +117,4 @@ class PhonebookDatabase:
         count = self.cursor.fetchone()[0]
         return count > 0
     
-    def get_contacts_by_alphabet(self, letter_range):
-        letter_start, letter_end = letter_range.split('-')
-
-        query = ("SELECT * FROM contacts WHERE last_name >= %s AND last_name <= %s ORDER BY last_name")
-        values = (letter_start, letter_end)
-
-        self.cursor.execute(query, values)
-        columns = [col[0] for col in self.cursor.description]
-        contacts = [dict(zip(columns, row)) for row in self.cursor.fetchall()]
-        return contacts
 

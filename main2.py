@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
-from PyQt4.QtGui import QApplication, QMainWindow, QWidget, QLabel, QLineEdit, QPushButton, QCheckBox, QMessageBox, QDialog, QDateEdit, QVBoxLayout
+from PyQt4.QtGui import QApplication, QMainWindow, QWidget, QLabel, QLineEdit, QPushButton, QCheckBox, QMessageBox, QDialog, QDateEdit, QVBoxLayout, QHBoxLayout
 from PyQt4.QtCore import QDate
 
 from contacts_widget import ContactsWidget
@@ -177,19 +177,26 @@ class MainWindow(QMainWindow):
         self.initUI()
         self.show()
 
+    def filter_contacts_by_alphabet(self, letter):
+        self.contacts_widget.filter_contacts_by_alphabet(letter)
+
     def initUI(self):
         self.setGeometry(300, 300, 700, 400)
         self.setWindowTitle(u'Phonebook')
         self.show_birthdays_notification()
     
-        # создаем виджет с таблицей контактов
-        contacts_widget = ContactsWidget(self)
+        # создаем виджет с таблицей контактов и сохраняем ссылку на него
+        self.contacts_widget = ContactsWidget(self)
     
-        # добавляем виджет с таблицей контактов в layout главного окна
-        layout = QVBoxLayout()
+        # создаем виджет алфавитного указателя
         alphabet_widget = AlphabetWidget(self)
+    
+        # добавляем виджеты в горизонтальную разметку
+        layout = QHBoxLayout()
         layout.addWidget(alphabet_widget)
-        layout.addWidget(contacts_widget)
+        layout.addWidget(self.contacts_widget)
+    
+        # настраиваем разметку и устанавливаем ее в центральный виджет
         widget = QWidget()
         widget.setLayout(layout)
         self.setCentralWidget(widget)
